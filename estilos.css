@@ -1,0 +1,313 @@
+@charset "utf-8";
+
+body,td,th {
+	color: #000000;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.0;
+}
+body {
+	background-color: #CCC;
+	background-image: ;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-attachment: fixed;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+a:link {
+	color: #000CC;
+}
+a:visited {
+	color: #990099;
+}
+a:hover {
+	color: #000CC;
+}
+a:active {
+	color: #000CC;
+}
+body {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-style: normal;
+	line-height: 1.5em;
+	color: #000;
+	background-color: #FFF;
+	padding: 0px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	width: auto;
+	margin-top: 0px;
+	margin-right: auto;
+	margin-bottom: 0px;
+	margin-left: auto;
+}
+.contenedor .header {
+	overflow: hidden;
+	background-color: #5c2134;
+	font-size: 24px;
+	height: 130px;
+	width: auto;
+	text-align: center;
+	vertical-align: middle;
+	color: #FFF;
+	font-weight: bold;
+	margin: auto;
+	overflow: auto;
+	line-height: 1.5em;
+}
+.contenedor .publicacion {
+	height: 500px;
+	width: 66%;
+	margin-left: 2%;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 2.5px;
+	color: #000;
+	float: left;
+	clear: none;
+}
+.contenedor .publicacion_contacto {
+	margin-top: 0px;
+	margin-right: 5%;
+	margin-bottom: 20px;
+	margin-left: 5%;
+	text-align: center;
+	font-size: 16px;
+	line-height: 1em;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+.contenedor .publicacion_contacto table tr td h2 {
+	font-size: 28px;
+	color: #5C2134;
+	text-align: center;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+
+.subtitulo {
+	font-weight: bold;
+	text-align: center;
+	font-size: 18px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.contenedor .publicacion table tr td h2 {
+	font-size: 28px;
+	color: #5C2134;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.contenedor .pie_pagina {
+	font-size: 16px;
+	background-color: #5c2134;
+	text-align: center;
+	vertical-align: middle;
+	height: 120px;
+	color: #d8c295;
+	padding-top: 15px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	clear: both;
+}
+.contenedor .pie_pagina a:link {
+	color: #FFF;
+}
+.color_fondo_tablas {
+	background-color: #F1EDEE;
+	border-radius: 10px;
+}
+
+.contenedor .pie_pagina a:visited {
+	color: #FFF;
+}
+.contenedor .pie_pagina a:hover {
+	color: #FFF;
+}
+.contenedor .pie_pagina a:active {
+	color: #FFF;
+}
+.contenedor .prepiedepagina {
+	background-color: #d8c295;
+	height: 140px;
+	width: auto;
+	clear: both;
+}
+.Boton_menu_arriba {
+	overflow: auto;
+	background-color: #D8C295;
+	border-radius: 5px;
+	-webkit-transition: background-color 0.25s ease-in 0s;
+	-moz-transition: background-color 0.25s ease-in 0s;
+	-ms-transition: background-color 0.25s ease-in 0s;
+	-o-transition: background-color 0.25s ease-in 0s;
+	transition: background-color 0.25s ease-in 0s;
+	color: #000;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	cursor: pointer;
+	padding-top: 8px;
+	padding-right: 30px;
+	padding-bottom: 8px;
+	padding-left: 30px;
+	margin-top: 0px;
+	margin-right: 5px;
+	margin-bottom: 0px;
+	margin-left: 5px;
+	font-size: 16px;
+
+}
+.Boton_menu_tabla {
+	overflow: auto;
+	background-color: #D09B9C;
+	border-radius: 5px;
+	-webkit-transition: background-color 0.25s ease-in 0s;
+	-moz-transition: background-color 0.25s ease-in 0s;
+	-ms-transition: background-color 0.25s ease-in 0s;
+	-o-transition: background-color 0.25s ease-in 0s;
+	transition: background-color 0.25s ease-in 0s;
+	color: #000;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	cursor: pointer;
+	padding-top: 8px;
+	padding-right: 30px;
+	padding-bottom: 8px;
+	padding-left: 30px;
+	margin-top: 0px;
+	margin-right: 5px;
+	margin-bottom: 0px;
+	margin-left: 5px;
+	font-size: 16px;
+}
+.contenedor .header table tr td {
+	color: #FFF;
+	font-size: medium;
+	text-align: center;
+}
+.contenedor .menu {
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 20px;
+	padding-right: 0px;
+	padding-bottom: 20px;
+	padding-left: 0px;
+}
+.contenedor .menu_lateral {
+	text-align: center;
+	width: 26%;
+	background-color: #CCC;
+	float: right;
+	height: 500px;
+	border-radius: 5px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	margin-right: 2%;
+	clear: none;
+}
+.fa {
+	font-size: 30px;
+	text-align: center;
+	text-decoration: none;
+	color: #5C2134;
+	padding-top: 90px;
+	padding-right: 2px;
+	padding-bottom: 0px;
+	padding-left: 2px;
+}
+.Boton_menu_arriba:hover {
+	background-color: #B35940;
+	text-align: center;
+}
+.Boton_menu_tabla:hover {
+	background-color: #C8575A;
+	text-align: center;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #DDBBA2;
+	min-width: 150px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+	margin-left: 6px;
+	text-align: left;
+	font-size: 14px;
+	color: #000;
+}
+
+.dropdown-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	-ms-transition: all 0.2s;
+	-o-transition: all 0.2s;
+	transition: all 0.2s;
+}
+.dropdown-content a:visited {
+	color: black;
+}
+.dropdown-content a:active {
+	color: black;
+}
+.dropdown-content a:hover {
+	background-color: #CC9D7D;
+	color: black;
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+.parrafos {
+	font-size: 14px;
+	text-align: justify;
+	line-height: 1.5em;
+	margin-top: 5px;
+	margin-right: 6%;
+	margin-bottom: 5px;
+	margin-left: 6%;
+}
+
+
+.dropdown:hover .Boton_menu_arriba {
+	background-color: #B35940;
+	text-align: center;
+}
+.contenedor .publicacion_seguimiento table tr td h2 {
+	color: #5C2134;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 28px;
+}
+.contenedor .publicacion_seguimiento {
+	margin-top: 6px;
+	margin-right: 6%;
+	margin-bottom: 6px;
+	margin-left: 6%;
+	height: 500px;
+}
+.perfil {
+	text-align: left;
+	font-size: 14px;
+	line-height: 1.1em;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	margin-left: 16px;
+}

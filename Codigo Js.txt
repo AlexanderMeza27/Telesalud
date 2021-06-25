@@ -1,0 +1,986 @@
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+/* global formData */
+var CTselect = true;
+var cerrarPopPup = false;
+var loading = "<img src='../../images/loading.gif' width='22'>";
+var img_loading = "../../images/loader.gif";
+var grabarSolicitud = false;
+
+//Funcion para salir del sistema
+function salir() {
+    /*if (confirm(" Desea salir del Sistema ? ")){//caso afirmativo
+     location='../logout.php';
+     }*/
+    swal({
+        title: 'Aviso',
+        text: "Desea cerrar el sistema?",
+        showCancelButton: true,
+        confirmButtonColor: '#5C2134',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si'
+    }, function (confi) {
+        if (confi) {
+            location = '../logout.php';
+        } else
+            return;
+    })
+}
+
+/*Metodo para Buscar un CT*/
+function catCT() {
+    var validos = document.getElementById('hd_plazas').value;
+
+
+    if (validos == "") {
+        //alert('Debe seleccionar una plaza asignada');
+        swal("Aviso", "Debe seleccionar una plaza asignada");
+        LimpiaCentro();
+    } else if ((document.getElementById('txt_idCt').value.length) < 10) {
+        //alert('Debe escribir los 10 carï¿½cteres del Centro de Trabajo');
+        swal("Aviso", 'Debe escribir los 10 caracteres del Centro de Trabajo');
+        LimpiaCentro();
+    } else {
+        var centros = validos.split("|");
+        var ele;
+        var resp = false;
+        var ct = document.getElementById('txt_idCt').value;
+        var subs = document.getElementById('hd_sub').value;
+        var tot = centros.length;
+        for (var i = 0; i < tot; i++) {
+            ele = centros[i].split("-");
+            if (ele[3] == ct) {
+                resp = true;
+                break;
+            }
+        }
+        if (resp) {
+            buscarCT(ct, 1, 0, subs);
+        } else if (!resp) {
+            //alert('Debe escribrir un centro de las plazas seleccionadas');
+            swal("Aviso", 'Debe escribrir un centro de las plazas seleccionadas');
+            LimpiaCentro()
+        }
+    }
+}
+
+function cambiarCt() {
+    var sel = document.getElementById('hd_idCt').value;
+    var resp = false;
+    if (sel != "" && confirm("Desea Cambiar el Ct Seleccionado?")) {
+        resp = true;
+    }
+    if (resp) {
+        document.getElementById('hd_idCt').value = "";
+        document.getElementById('txt_idCt').value = "";
+        LimpiaCentro();
+    }
+}
+
+function LimpiaCentro() {
+    document.getElementById('txt_nomCt').value = "";
+    document.getElementById('txt_turCt').value = "";
+    document.getElementById('txt_ZonaCt').value = "";
+    document.getElementById('txt_telCt').value = "";
+    document.getElementById('txt_munCt').value = "";
+    document.getElementById('hd_munCtO').value = "";
+}
+
+function ValidaNivel() {
+    var sel = document.getElementById('cboNivel').value;
+    var op = 0;
+    if (sel != "0") { //ha cambiado el valor del combo nivel
+        /*
+        var elt = document.getElementById('cboZona1');
+        if (elt == "SELECT") {
+            if (document.getElementById('cbo00').options[document.getElementById('cbo00').selectedIndex].value != 0 && document.getElementById('cboZona1').options[document.getElementById('cboZona1').selectedIndex].value != 0) {
+                op = 1;
+            }
+            if (document.getElementById('cbo10').options[document.getElementById('cbo10').selectedIndex].value != 0 && document.getElementById('cboZona2').options[document.getElementById('cboZona2').selectedIndex].value != 0) {
+                op = 1;
+            }
+            if (document.getElementById('cbo20').options[document.getElementById('cbo20').selectedIndex].value != 0 && document.getElementById('cboZona3').options[document.getElementById('cboZona3').selectedIndex].value != 0) {
+                op = 1;
+            }
+        } else {
+            if (document.getElementById('cbo00').options[document.getElementById('cbo00').selectedIndex].value != 0 && document.getElementById('cboZona1').value != "") {
+                op = 1;
+            }
+            if (document.getElementById('cbo10').options[document.getElementById('cbo10').selectedIndex].value != 0 && document.getElementById('cboZona2').value != "") {
+                op = 1;
+            }
+            if (document.getElementById('cbo20').options[document.getElementById('cbo20').selectedIndex].value != 0 && document.getElementById('cboZona3').value != "") {
+                op = 1;
+            }
+        }
+        if (Number(op) > 0) {
+            // if(confirm("Se tienen algunas Zonas seleccionadas \n \u00bfDesea cambiar de nivel?")){
+            //     crearElementos(sel);
+            // } 
+            swal({
+                title: 'Aviso',
+                text: "Se tienen algunas Zonas seleccionadas \n \u00bfDesea cambiar de nivel?",
+                showCancelButton: true,
+                confirmButtonColor: '#5C2134',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si'
+            }, function (confi) {
+                if (confi) {
+                    crearElementos(sel);
+                } else
+                    return;
+            })
+        } else {
+            crearElementos(sel);
+        }
+        */
+        if (sel == 6) {
+            document.getElementById('dv_especialidad').style.display = '';
+        } else
+            document.getElementById('dv_especialidad').style.display = 'none';
+    }
+}
+
+function crearElementos(sel) {
+    document.getElementById('cbo00').value = 0; //mun1
+    document.getElementById('cbo10').value = 0; //mun2
+    document.getElementById('cbo20').value = 0; //mun3
+    if (sel == "5" || sel == "7" || sel == "11") {
+        CrearCajas();
+    } else {
+        CrearCombos()
+    }
+}
+
+function CrearCombos() {
+    document.getElementById('tdz1').innerHTML = "";//combo1
+    var z1 = document.getElementById('tdz1');
+    createSelect(z1, "cboZona1");
+
+    document.getElementById('tdz2').innerHTML = "";//combo2
+    var z2 = document.getElementById('tdz2');
+    createSelect(z2, "cboZona2");
+
+    document.getElementById('tdz3').innerHTML = "";//combo3
+    var z3 = document.getElementById('tdz3');
+    createSelect(z3, "cboZona3");
+}
+
+function CrearCajas() {
+    document.getElementById('tdz1').innerHTML = "";//caja1
+    var z1 = document.getElementById('tdz1');
+    createInput(z1, "cboZona1", "");
+
+    document.getElementById('tdz2').innerHTML = "";//caja2
+    var z2 = document.getElementById('tdz2');
+    createInput(z2, "cboZona2", "");
+
+    document.getElementById('tdz3').innerHTML = "";//caja3
+    var z3 = document.getElementById('tdz3');
+    createInput(z3, "cboZona3", "");
+}
+
+function buscarCT(idct, pgDestino, pgTotal, subs) {
+    document.getElementById('LayerScreen').style.visibility = "visible";
+    document.getElementById('LayerMostrar').style.visibility = "visible";
+    document.getElementById('txt_nomCt').value = ""; //Actualiza nombre ct
+    document.getElementById('txt_turCt').value = ""; //Actualiza turno
+    document.getElementById('txt_ZonaCt').value = ""; //Actualiza turno
+    document.getElementById('txt_telCt').value = ""; //Actualiza turno
+    document.getElementById('txt_munCt').value = ""; //Actualiza turno
+    ajax = nuevoAjax();
+    ajax.open("POST", "./buscaCT.php", true);
+    ajax.onreadystatechange = function () {
+        if (ajax.readyState == 4) {
+            var response = trim(ajax.responseText);
+            if (response == "OFFLINE") {
+                location = "./logout.php";
+            } else {
+                (document.getElementById('LayerMostrar')).innerHTML = response;
+                /*opt=document.createElement('option');
+                 opt.appendChild(document.createTextNode('--Seleccione un Valor--'));
+                 opt.value = '-1';
+                 (document.getElementById('LayerMostrar')).innerHTML = response;
+                 document.getElementById('txt_idCt').value="";
+                 (document.getElementById('txt_turCt')).value="";*/
+                //(document.getElementById('txt_turCt')).appendChild(opt);
+            }
+        }
+    }
+    ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    ajax.send("idct=" + idct + "&id_sub=" + subs + "&pgActual=" + pgDestino + "&pgTotal=" + pgTotal);
+}
+
+function plaza() {
+    var validos = document.getElementById('hd_plazas').value;
+
+
+    if (validos == "") {
+        //alert('Debe seleccionar una plaza asignada');
+        swal("Aviso", "Debe seleccionar una plaza asignada");
+        LimpiaCentro();
+    } else if ((document.getElementById('txt_idCt').value.length) < 10) {
+        //alert('Debe escribir los 10 carï¿½cteres del Centro de Trabajo');
+        swal("Aviso", 'Debe escribir los 10 caracteres del Centro de Trabajo');
+        LimpiaCentro();
+    } else {
+        var centros = validos.split("|");
+        var ele;
+        var resp = false;
+        var ct = document.getElementById('txt_idCt').value;
+        var subs = document.getElementById('hd_sub').value;
+        var tot = centros.length;
+        for (var i = 0; i < tot; i++) {
+            ele = centros[i].split("-");
+            if (ele[3] == ct) {
+                resp = true;
+                break;
+            }
+        }
+        if (resp) {
+            detallePaza();
+        } else if (!resp) {
+            //alert('Debe escribrir un centro de las plazas seleccionadas');
+            swal("Aviso", 'Debe escribrir un centro de las plazas seleccionadas');
+            LimpiaCentro()
+        }
+    }
+}
+
+
+/****COMPORTAMIENTO DE MODIFICACION DE DATOS DE LA PLAZA   *******************************/
+function detalleCT() {
+    if ((document.getElementById('txt_idCt').value.length) < 10) {
+        swal("Aviso", 'Debe escribir los 10 caracteres del Centro de Trabajo');
+        //LimpiaCentro();
+    } else {
+        CTselect = true;
+        nomCt = "";
+        turno = "";
+        idTurno = "";
+        ajax = nuevoAjax();
+        ajax.open("POST", "./validaSvr.php", true);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                var response = trim(ajax.responseText);
+                if (response == "OFFLINE") {
+                    location = "./logout.php";
+                } else if (response == "NOT_FOUND") {
+                    CTselect = false;
+                    swal("Aviso", 'La Clave del Centro es incorrecta');
+                } else {
+                    var json = JSON.parse(response);
+                    console.log(json);
+                    nomCt = json.nomCt;
+                    turno = json.turno;
+                    idTurno = json.idTurno;
+                    mpio = json.mpio;
+                    idMpio = json.idMpio;
+                }
+                document.getElementById("txt_nomCt").value = nomCt;
+                document.getElementById("txt_turno").value = turno;
+                document.getElementById("hdTurno").value = idTurno;
+                document.getElementById("txt_municipio").value = mpio;
+                document.getElementById("hdIdMpio").value = idMpio;
+                if (cerrarPopPup) {
+                    detallePlazaSelect();
+                }
+            }
+        }
+
+        idct = document.getElementById('txt_idCt').value;
+        subs = document.getElementById('hdSubs').value;
+
+        ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        ajax.send("accion=detalleCT&idct=" + idct + "&id_sub=" + subs);
+    }
+}
+
+function detallePaza(index) {
+    var sY = 1300-event.screenY;
+
+    if (document.getElementById('chkplaza' + index).checked) {
+        document.getElementById('chkplaza' + index).checked = false;
+        document.getElementById('LayerScreen').style.visibility = "visible";
+        document.getElementById('LayerMostrar').style.visibility = "visible";
+        document.getElementById('LayerMostrar').style.top= sY + "px";
+        plaza = document.getElementById('hdPlaza' + index).value;
+        idct = document.getElementById('hdCt' + index).value;
+        nivel = document.getElementById('hdNivel' + index).value;
+        materia = document.getElementById('hdMateria' + index).value;
+        especialidad = document.getElementById('hdEspecialidad' + index).value;
+        Anios = document.getElementById('hdAnios' + index).value;
+        Meses = document.getElementById('hdMeses' + index).value;
+        Dias = document.getElementById('hdDias' + index).value;
+        cerrarPopPup = false;
+
+
+        ajax = nuevoAjax();
+        ajax.open("POST", "./detallePlaza.php", true);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                var response = trim(ajax.responseText);
+                if (response == "OFFLINE") {
+                    location = "./logout.php";
+                } else { 
+                    (document.getElementById('LayerMostrar')).innerHTML = response;
+                    ValidaNivelPlaza();//despliega combos segun el nivel que trae en la forma
+                    detalleCT();// carga los datos esenciales del centro
+                }
+            }
+        }
+        ajax.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        ajax.send("index=" + index + "&plaza=" + plaza + "&SubSis=" + subs + "&idct=" + idct + "&nivel=" + nivel + "&materia=" + materia +"&especialidad="+especialidad+ "&Anios=" + Anios + "&Meses=" + Meses + "&Dias=" + Dias);
+    } else {
+        document.getElementById('seleccion').value = parseInt(document.getElementById('seleccion').value) - 1;
+    }
+}
+
+function cerrar() {
+    var campos = "";
+    //validacion de campos
+    var sel = document.getElementById('cboNivelPza');
+    var opcion = sel.options[sel.selectedIndex].text;
+
+    if (document.getElementById('cboNivelPza').selectedIndex == 0) {
+        campos += " Nivel,";
+    } else if (opcion.indexOf(' SECUNDARIA') >= 0 && document.getElementById('cboMateriaPza').selectedIndex == 0) {
+        campos += " Materia,";
+    } else if (opcion.indexOf('ESPECIAL') >= 0 && document.getElementById('cboNivelEsp').selectedIndex == 0) {
+        campos += " Nivel Especial,";
+    }
+
+
+    if (document.getElementById('txt_nomCt').value == "") {
+        campos += " Centro de Trabajo,";
+    }
+    if (document.getElementById('txtaniosCt').value == "" ) {
+        campos += " A\u00F1os de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtMesesCt').value == "") {
+        campos +=" Meses de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtDiasCt').value == "") {
+        campos +=" Dias de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtaniosCt').value >= 50 ) {
+        campos += " A\u00F1os de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtMesesCt').value > 12) {
+        campos +=" Meses de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtDiasCt').value > 31) {
+        campos +=" Dias de antig\u00FCedad,";
+    }
+    if (document.getElementById('txtaniosCt').value <= 0 && document.getElementById('txtMesesCt').value <= 0 && document.getElementById('txtDiasCt').value <= 0) {
+        campos +=" Antig\u00FCedad en la plaza,";
+    }
+    if (campos != "") {
+        swal("Aviso", 'Informaci\u00F3n invalida en los campos: ' + campos);
+    } else {
+        cerrarPopPup = true
+        detalleCT();
+    }
+}
+
+function detallePlazaSelect() {
+    if (CTselect) {
+
+        index = 0;
+        idmateria = "";
+        materia = "";
+        idespesialidad = "";
+        especialidad = "";
+        index = document.getElementById('hdIndex').value;
+        var sel = document.getElementById('cboNivelPza');
+        var nivel = sel.options[sel.selectedIndex].text;
+        if (nivel.indexOf(' SECUNDARIA') >= 0) {
+            idmateria = document.getElementById('cboMateriaPza').value;
+            materia = document.getElementById('cboMateriaPza').options[document.getElementById('cboMateriaPza').selectedIndex].text;
+        } else if (nivel.indexOf('ESPECIAL') >= 0) {
+            idespesialidad = document.getElementById('cboNivelEsp').value;
+            especialidad = document.getElementById('cboNivelEsp').options[document.getElementById('cboNivelEsp').selectedIndex].text;
+        }
+
+        document.getElementById('chkplaza' + index).checked = true;
+        document.getElementById('hdCt' + index).value = document.getElementById('txt_idCt').value; //Actualiza la clave del ct.
+        document.getElementById('hdMpioCt' + index).value = document.getElementById('hdIdMpio').value.substr(1, 2);
+        document.getElementById('hdNivel' + index).value = document.getElementById('cboNivelPza').value;
+        document.getElementById('hdMateria' + index).value = idmateria;
+        document.getElementById('hdEspecialidad' + index).value = idespesialidad;
+
+        document.getElementById('hdAnios' + index).value = document.getElementById('txtaniosCt').value;
+        document.getElementById('hdMeses' + index).value = document.getElementById('txtMesesCt').value;
+        document.getElementById('hdDias' + index).value = document.getElementById('txtDiasCt').value;
+
+        document.querySelector('#lblidCt' + index).innerText = document.getElementById('txt_idCt').value;
+        document.querySelector('#lblCt' + index).innerText = document.getElementById('txt_nomCt').value.replace('"','');
+        document.querySelector('#lblturno' + index).innerText = document.getElementById('hdTurno').value;
+        document.querySelector('#lblnivel' + index).innerText = nivel;
+        document.querySelector('#lblmateria' + index).innerText = materia + especialidad;
+
+        document.querySelector('#lblAntiguedad' + index).innerText = document.getElementById('txtaniosCt').value + 'A ' + document.getElementById('txtMesesCt').value + 'M ' + document.getElementById('txtDiasCt').value + 'D';
+        document.getElementById('seleccion').value = parseInt(document.getElementById('seleccion').value) + 1;
+
+        //document.getElementById('#lblidCt' + index).title = document.getElementById('txt_nomCt').value;
+    }
+    document.getElementById('LayerMostrar').style.visibility = "hidden";
+    document.getElementById('LayerScreen').style.visibility = "hidden";
+
+}
+
+
+function ValidaNivelPlaza() {
+    var sel = document.getElementById('cboNivelPza');
+    var opcion = sel.options[sel.selectedIndex].text;
+    var op = sel.value;
+    if (sel != "0") { //ha cambiado el valor del combo nivel
+        document.getElementById('Materias').style.display = "none";
+        document.getElementById('NivelEspecial').style.display = "none";
+        if (opcion.indexOf(' SECUNDARIA') >= 0) {//No considerar 'TELESECUNDARIA', solamente 'EDUCACION SECUNDARIA'
+            //if (~opcion.indexOf('World'))
+            document.getElementById('Materias').style.display = "";
+        } else if (opcion.indexOf('ESPECIAL') >= 0) {
+            document.getElementById('NivelEspecial').style.display = "";
+        }
+    }
+}
+/****************************************************************************/
+
+function pagging(pgDestino, pgTotal, subs) {
+    buscarCT(idctActual, pgDestino, pgTotal, subs);
+}
+
+function seleccionaCt(idct, nombrect, turno, zona, tel, mun, codmun) {
+    document.getElementById('txt_idCt').value = idct; //Actualiza la clave del ct.
+    document.getElementById('hd_idCt').value = idct; //Actualiza turno
+    document.getElementById('txt_nomCt').value = nombrect; //Actualiza nombre ct
+    document.getElementById('txt_turCt').value = turno; //Actualiza turno
+    document.getElementById('txt_ZonaCt').value = zona; //Actualiza turno
+    document.getElementById('txt_telCt').value = tel; //Actualiza turno
+    document.getElementById('txt_munCt').value = mun; //Actualiza turno
+    document.getElementById('hd_munCtO').value = codmun; //Actualiza turno
+    document.getElementById('LayerMostrar').style.visibility = "hidden";
+    document.getElementById('LayerScreen').style.visibility = "hidden";
+    /*codmun=codmun.substring(1,3);
+     var arr=[[mun,codmun]];
+     CreateOptionsM(document.getElementById('cbo00'), arr);
+     CreateOptionsM(document.getElementById('cbo10'), arr);
+     CreateOptionsM(document.getElementById('cbo20'), arr);*/
+}
+
+function ValidaForma(forma) {
+     //   document.getElementById('LayerScreen').style.visibility = "visible";
+    //document.getElementById('LayerMostrar').style.visibility = "visible";
+   //document.getElementById('LayerScreen').innerHTML = loading3;
+   
+    var param = "";
+    if(grabarSolicitud ){return;} // para prevenir que presione varias veces el boton de grabar
+    //validar condiciones
+    if (!document.getElementById('id_condiciones').checked) {
+        swal("Aviso", "Debe indicar que acepta los terminos establecidos en la convocatoria.");
+        return;
+    }
+    //Validando NIVEL
+    if (document.getElementById('cboNivel').options[document.getElementById('cboNivel').selectedIndex].value == 0) {
+        param += "\n\n - Nivel Solicitud. ";
+    }
+
+    //Validando  DATOS DEL CONTACTO
+    contacto = "";
+    if (document.getElementById('cboMpio').options[document.getElementById('cboMpio').selectedIndex].value == 0) {
+        contacto += "Municipio";
+    }
+    if (document.getElementById('txtCalle').value == "") {
+        contacto += (contacto != "" ? ", " : "") + "Calle";
+    }
+    if (document.getElementById('txtNum').value == "") {
+        contacto += (contacto != "" ? ", " : "") + "Numero";
+    }
+    if (document.getElementById('txtCol').value == "") {
+        contacto += (contacto != "" ? ", " : "") + "Colonia";
+    }
+    if (document.getElementById('txt_tel').value == "") {
+        contacto += (contacto != "" ? ", " : "") + "Telefono";
+    }
+    if (document.getElementById('txt_cel').value == "") {
+        contacto += (contacto != "" ? ", " : "") + "Celular";
+    }
+    if (contacto != "") {
+        param += "\n\n - " + contacto + " de contacto."
+    }
+
+    //Validano INFORMACIOM ACADEMICA
+    academica = "";
+    if (document.getElementById('cboGrado').options[document.getElementById('cboGrado').selectedIndex].value == 0) {
+        academica += "Grado Acad\u00E9mico";
+    }
+    if (document.getElementById('txtPromedio').value == "" || !typeof document.getElementById('txtPromedio').value == 'number') {
+        academica += (academica != "" ? ", " : "") + "Promedio";
+    }
+    if (document.getElementById('txtConocimiento').value == "") {
+        academica += (academica != "" ? ", " : "") + "Area de conocimiento";
+    }
+    if (academica != "") {
+        param += "\n\n - " + academica + ", de la informaci\u00F3n acad\u00E9mica."
+    }
+    //Validano INFORMACION DE LA PLAZA
+    if (document.getElementById('txtIngreso').value == "") {
+        param += "\n\n - fecha de ingreso. ";
+    }
+
+    //Validando SELECCION DE PLAZA   
+    if (seleccion === 0) {
+        param += "\n\n - Seleccionar Plaza. ";
+    }
+    //validando DOCUMENTOS
+    var formulario = document.getElementById("datos");
+    archivo = ""
+    cantidad = 0;
+    for (var i = 0; i < formulario.elements.length; i++) {
+        if (formulario.elements[i].type == 'file') {
+            var file = formulario.elements[i];
+            if (!file.value == "") {
+                if (file.files[0].size >= file.attributes['maxsize'].value || !file.accept.includes(file.files[0].type)) {
+                    archivo += "\n\n - El archivo " + file.name + " no corresponde al formato o medida maxima";
+                } else {
+                    cantidad++;
+                }
+            }
+        }
+    }
+
+    param += archivo;
+    if (param == "") {
+        confirma(forma);
+    } else {
+        //alert("Falta especificar los siguientes datos: " + param);
+        swal("Aviso", "Falta especificar los siguientes datos: " + param);
+    }
+
+}
+
+function confirma(forma) {
+    var msg = "Ha seleccionado las siguientes plazas para cambio:\n";
+    var cad = "";
+    var resp = false;
+    setChecks();
+    var cadplz = document.getElementById('hd_plazas').value;
+    var arrplazas = cadplz.split("|");
+    console.log(arrplazas);
+    var tot = arrplazas.length;
+    var arrplz;
+    for (var i = 0; i < tot; i++) {
+
+        arrplz = arrplazas[i].split("-");
+        cad = cad + arrplz[0] + arrplz[1] + "/" + arrplz[2];
+        if (i < (tot - 1)) {
+            cad = cad + ", ";
+        }
+    }
+    /******************/
+    var formulario = document.getElementById("datos");
+    archivo = ""
+    cantidad = 0;
+    for (var i = 0; i < formulario.elements.length; i++) {
+        if (formulario.elements[i].type == 'file') {
+            var file = formulario.elements[i];
+            if (!file.value == "") {
+                if (file.files[0].size >= file.attributes['maxsize'].value || !file.accept.includes(file.files[0].type)) {
+                    archivo += "\n\n - El archivo " + file.name + " no corresponde al formato o medida maxima";
+                } else {
+                    cantidad++;
+                }
+            }
+        }
+    }
+    /****************************/
+ 
+    cad = cad + "\n";
+    msg = msg + cad + "Desea Grabar la Solicitud?"
+    swal({
+        title: 'Aviso',
+        text: msg,
+        showCancelButton: true,
+        confirmButtonColor: '#5C2134',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si',
+        allowOutsideClick:false,
+        cancelButtonText: 'No'
+    }, function () {  
+        resp=true;
+        grabarSolicitud = true;//para prevenir que presione varias veces el boton grabar
+        calisC();
+        
+    })
+    return resp;
+}
+
+function cboZona(idmun, cbmun) {
+    var sel = document.getElementById('cboNivel').value;
+    if (sel != "0") {
+        if (sel != "5" && sel != "7" && sel != "11") { //llenar los combos
+            var sub = document.getElementById('hd_sub').value; //subsistema
+            var nivel = document.getElementById('cboNivel').value; //Actualiza turno
+
+            var municipio = document.getElementById('cbo' + (cbmun - 1) + '0'); //Cambia el municipio a seleccione sino esta seleccionado el Nivel
+            var contenedor = document.getElementById('cboZona' + cbmun);
+            if (document.getElementById('cboNivel').options[document.getElementById('cboNivel').selectedIndex].value == '0') {
+                //alert("Falta Seleccionar el Nivel de la Solicitud");  
+                swal("Aviso", "Falta Seleccionar el Nivel de la Solicitud");
+                municipio.selectedIndex = 0;
+            } else {
+                ajaxExp = nuevoAjax();
+                ajaxExp.open("POST", "./regcambiosvr.php", true);
+                ajaxExp.onreadystatechange = function () {
+                    if (ajaxExp.readyState === 4) {
+                        var response = trim(ajaxExp.responseText);
+                        if (response === "OFFLINE") {
+                            //alert("Su sesiï¿½n ha expirado... Ingrese al sistema nuevamente.");
+                            swal("Aviso", "Su sesion ha expirado. Ingrese al sistema nuevamente.");
+                            parent.location = "../logout.php";
+                        } else {
+                            resp = JSON.parse(response);
+                            var ele = document.getElementById('cboZona' + cbmun);
+                            CreateOptions(ele, resp);
+
+                        }
+                    }
+                }//function
+                ajaxExp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                ajaxExp.send("accion=zonas&sub=" + sub + "&nivel=" + nivel + "&idmun=" + idmun.value + "&cbmun=" + cbmun);
+            }
+        }
+    } else {
+        //alert("Falta Seleccionar Nivel");
+        swal("Aviso", "Falta Seleccionar Nivel");
+    }
+}
+
+function grabarSol(forma) {
+    var formData = new FormData(document.getElementById("datos"));
+    //formData.append("files", document.getElementById('file-input'));
+    const file = document.querySelector('file-input').files[0];
+    formData.append('file-input', file);
+
+    ajaxExp = nuevoAjax();
+    ajaxExp.open("POST", "./regcambiosvr.php", true);
+    ajaxExp.open();
+    ajaxExp.onreadystatechange = function () {
+        if (ajaxExp.readyState == 4) {
+            var response = trim(ajaxExp.responseText);
+            if (response === "OFFLINE") {
+                swal("Aviso", "Su sesion ha expirado... Ingrese al sistema nuevamente.");
+                parent.location = "../logout.php";
+            } else {
+                if (response.substr(0, 2) === "OK") {
+                    alert(response.split(':')[1]);
+                    location = "../Reportes/generaReporte.php?accion=printsol&txt_sol=" + response.split(':')[1];
+                    swal("Aviso", "La solicitud se registro correctamente.");
+                    location = "../cambios/regsolicitudes.php?sfx=120";
+                } else
+                    swal("Aviso", response);
+            }
+        }
+    }//function
+    ajaxExp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    //ajaxExp.send(serialize(forma)+"&accion=GrabaSolicitud"); 
+    ajaxExp.send(formData + "$fileInput=" + file + "&accion=GrabaSolicitud");
+
+}
+
+function calisC() {
+    var i = 0;
+  
+   // document.getElementById('LayerScreen').style.visibility = "visible";
+   document.getElementById('LayerScreen').style.visibility = "visible";
+   var i = 0;
+    const formData = new FormData(document.getElementById("datos"));
+    var frm = document.getElementById("datos");
+    for (i = 0; i < frm.elements.length; i++)
+    {
+        if (frm.elements[i].type == 'file') {
+            //file = document.querySelector('#'+frm.elements[i].name).files[0];
+            const file = frm.elements[i].files[0];
+            if (!frm.elements[i].value == "") {
+                formData.set(frm.elements[i].name, file);
+            }
+        }
+    }
+    formData.set('accion', 'GrabaSolicitud');
+    
+      //https://stackoverflow.com/questions/46773828/loading-progress-form-submit-using-sweetalert
+      window.swal({
+        title: "",
+        text: "Grabando Solicitud...",
+        imageUrl: img_loading ,
+        showConfirmButton: false,
+        allowOutsideClick: false
+    });
+    
+    $.ajax({
+        type: 'POST',
+        url: './regcambiosvr.php',
+        data: formData,
+        processData: false,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        cache: false,
+        success: function (response) {
+            console.log(response);
+            if (response === "OFFLINE") {
+                window.swal({
+                    title: "Aviso",
+                    text: "Su sesion ha expirado... Ingrese al sistema nuevamente.",
+                    showConfirmButton: true,
+                });
+                grabarSolicitud = false;
+                document.getElementById('LayerScreen').style.visibility = "hidden";
+                parent.location = "../logout.php";
+            }else if (response.includes("OK:")) {
+                //location = "../Reportes/generaReporte.php?accion=printsol&txt_sol=" + response.split(':')[1];
+                window.swal({
+                    title: "Aviso",
+                    text: "La solicitud se registro correctamente.",
+                    showConfirmButton: true,
+                });
+                grabarSolicitud = false;
+                document.getElementById('LayerScreen').style.visibility = "hidden";
+               location = "../cambios/regsolicitudes.php?sfx=120";
+            } else{
+                window.swal({
+                    title: "Ocurrio un error:",
+                    text: req.responseText,
+                    showConfirmButton: true,//false,
+                    //timer: 1500
+                });
+                document.getElementById('LayerScreen').style.visibility = "hidden";
+                grabarSolicitud = false;
+            }
+        },
+        error: function () {
+            var msg = "OcurriÃ³ un error al registrar la solicitud.";
+            swal("Aviso", msg, "error");
+            document.getElementById('LayerScreen').style.visibility = "hidden";
+            grabarSolicitud = false;
+        }
+    });
+    
+}
+
+
+function calisc_anterior(){
+ var req = new XMLHttpRequest();
+    req.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            if (req.responseText === "OFFLINE") {
+                //window.swal("Aviso", "Su sesion ha expirado... Ingrese al sistema nuevamente.");
+                window.swal({
+                    title: "Aviso",
+                    text: "Su sesion ha expirado... Ingrese al sistema nuevamente.",
+                    showConfirmButton: true,//false,
+                    //timer: 1500
+                });
+               // parent.location = "../logout.php";
+            } else {
+                //if (req.responseText.substr(0, 2) === "OK") {
+                if (req.responseText.includes("OK:")) {
+                    //location = "../Reportes/generaReporte.php?accion=printsol&txt_sol=" + response.split(':')[1];
+                    //window.swal("Aviso", "La solicitud se registro correctamente.");
+                    window.swal({
+                        title: "Aviso",
+                        text: "La solicitud se registro correctamente.",
+                        showConfirmButton: true,//false,
+                        //timer: 1500
+                    });
+                   // location = "../cambios/regsolicitudes.php?sfx=120";
+                } else
+                window.swal({
+                    title: "Ocurrio un error:",
+                    text: req.responseText,
+                    showConfirmButton: true,//false,
+                    //timer: 1500
+                });
+                //window.swal("Aviso", req.responseText);
+            }
+            document.getElementById('LayerMostrar').style.visibility = "hidden";
+            document.getElementById('LayerScreen').style.visibility = "hidden";
+            //document.getElementById("botonBusqueda").innerHTML = "";
+        }
+    };
+
+    req.open("POST", "./regcambiosvr.php");
+    req.send(formData);
+
+}
+
+/**************************************/
+
+function setChecks() {
+    var control = document.getElementById('control').value;
+    document.getElementById('hd_plazas').value = "";
+    for (var z = 0; z < control; z++) {
+        if (document.getElementById('chkplaza' + z)) {
+            if (document.getElementById('chkplaza' + z).checked) {
+                document.getElementById('hd_plazas').value = document.getElementById('hd_plazas').value + '|' + document.getElementById('hdPlaza' + z).value;
+                //document.getElementById('hd_plazas').value+='|' + document.getElementById('subs_plaza' + z).value;
+            }
+        }
+    }
+    var str = document.getElementById('hd_plazas').value;
+    document.getElementById('hd_plazas').value = str.slice(1);
+    
+}
+
+function checarOpt(control) {
+    boton = 'btnOpt' + control.toString();
+
+    var valor = document.getElementById(boton).value;
+    cadena = document.getElementById('lstSelect').value;
+    if (valor == 'SI') {
+        cadena = cadena.replace(control.toString() + ';', '');
+        document.getElementById(boton).value = 'NO';
+    } else {
+        document.getElementById(boton).value = 'SI';
+        cadena = cadena + control.toString().trim() + ';';
+    }
+    document.getElementById('lstSelect').value = cadena;
+}
+
+/********************************************************************************************************************************************* */
+function removeRows(ctrl) {
+    while (ctrl.childNodes[0]) {
+        ctrl.removeChild(ctrl.childNodes[0]);
+    }
+}
+
+/********************************************************************************************************************************************* */
+/*Creacion de Elemntos htm con javaScript*/
+
+/********************************************************************************************************************************************* */
+
+/********************************************************************************************************************************************* */
+function CreateOptionsM(element, data) {
+    var opt = '';
+    var extra = '';
+    removeRows(element);
+    opt = document.createElement('option');
+    opt.appendChild(document.createTextNode('SELECCIONE'));
+    opt.value = '0';
+    opt.title = 'SELECCIONE';
+    element.appendChild(opt);
+
+    for (i = 0; i < data.length; i++) {
+        opt = document.createElement('option');
+        opt.appendChild(document.createTextNode(data[i][0]));
+        opt.value = data[i][1];
+        opt.title = data[i][0];
+        element.appendChild(opt);
+    }
+}
+
+function CreateOptions(element, data) {
+    var opt = '';
+    var extra = '';
+    removeRows(element);
+
+    opt = document.createElement('option');
+    opt.appendChild(document.createTextNode('SELECCIONE'));
+    opt.value = '0';
+    opt.title = 'SELECCIONE';
+    element.appendChild(opt);
+
+    for (i = 0; i < data.length; i++) {
+        opt = document.createElement('option');
+        extra = '';
+        if (data[i].da_obs != null && data[i].da_obs != '') {
+            extra = ' - ' + data[i].da_obs;
+        }
+        opt.appendChild(document.createTextNode(data[i].da_zona + extra));
+        opt.value = data[i].cn_reg;
+        opt.title = data[i].da_zona + extra;
+        element.appendChild(opt);
+    }
+}
+
+function ResetOptions(element) {
+    removeRows(element);
+    opt = document.createElement('option');
+    opt.appendChild(document.createTextNode('SELECCIONE'));
+    opt.value = '0';
+    opt.title = 'SELECCIONE';
+    element.appendChild(opt);
+}
+
+function createInput(ele, name, value) {
+    var input = document.createElement("input");
+    input.type = "text";
+    input.name = name;
+    input.id = name;
+    input.onblur = function () {
+        validaNumero(this)
+    };
+    input.value = value;
+    input.maxLength = "3";
+    input.setAttribute("style", "width:95%;text-transform:uppercase;");
+    ele.appendChild(input);
+}
+
+function createSelect(ele, name) {
+    var selectList = document.createElement("select");
+    selectList.id = name;
+    selectList.name = name;
+    //selectList.style="width:95%";
+    selectList.setAttribute("style", "width:95%;");
+    ele.appendChild(selectList);
+
+    opt = document.createElement('option');
+    opt.appendChild(document.createTextNode('SELECCIONE'));
+    opt.value = '0';
+    opt.title = 'SELECCIONE';
+    selectList.appendChild(opt);
+
+}
+/****************************************************/
+function openFile(id) {
+    $btnSelect = id;
+    var obj = document.getElementById("fileInput_" + id.toString());
+    obj.click();
+}
+
+function getFilePath() {
+    $('input[type=file]').change(function () {
+        var filePath = $('#fileUpload').val();
+    });
+}
+
+function selectFile(id) {
+    var fileInput = document.getElementById('fileInput_' + id);
+    var ban = true;
+    detalle = "";
+    var id = fileInput.id;
+
+    if (!fileInput.accept.includes(fileInput.files[0].type)) {
+        ban = false;
+        detalle = " No es de un formato aceptado"
+    }
+    if (fileInput.files[0].size >= fileInput.attributes['maxsize'].value) {
+        ban = false;
+        detalle += (detalle === "", "", " ,") + "Sobrepasa la el tamaÃ±o"
+    }
+
+    if (!ban) {
+        swal("Aviso", "El archivo seleccionado " + detalle + ".");
+        fileInput.value = '';
+    }
+
+
+
+}
+/************************************************************************************************************************/
